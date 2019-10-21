@@ -1,4 +1,4 @@
-import { Dictionary, getSchemaDirSync, getSchemaPath, getSchemaPathSync } from '@prisma/cli'
+import { Dictionary, getSchemaDirSync } from '@prisma/cli'
 import { getGenerators } from '@prisma/sdk'
 import 'array-flat-polyfill'
 import chalk from 'chalk'
@@ -27,6 +27,7 @@ import { Studio } from './Studio'
 import { EngineResults, FileMap, LocalMigration, LocalMigrationWithDatabaseSteps, LockFile, Migration } from './types'
 import { drawBox } from './utils/drawBox'
 import { formatms } from './utils/formartms'
+import { getDatamodelPath } from './utils/getDatamodelPath'
 import { groupBy } from './utils/groupBy'
 import { isWatchMigrationName } from './utils/isWatchMigrationName'
 import { deserializeLockFile, initLockFile, serializeLockFile } from './utils/LockFile'
@@ -115,7 +116,7 @@ export class Lift {
         }
 
         const generators = await getGenerators({
-          schemaPath: await this.getDatamodelPath(),
+          schemaPath: getDatamodelPath(this.projectDir),
           providerAliases,
           printDownloadProgress: false,
           version: packageJson.prisma.version,
@@ -173,7 +174,7 @@ export class Lift {
   private projectDir: string
   constructor(projectDir?: string) {
     this.projectDir = projectDir || this.getSchemaDir()
-    const schemaPath = this.getDatamodelPath()
+    const schemaPath = getDatamodelPath(this.projectDir)
     this.engine = new LiftEngine({ projectDir: this.projectDir, schemaPath })
   }
 
@@ -186,26 +187,8 @@ export class Lift {
     return schemaPath
   }
 
-  public getDatamodelPath(): string {
-    const { projectDir } = this
-    if (projectDir) {
-      if (fs.existsSync(path.join(projectDir, 'schema.prisma'))) {
-        return path.join(projectDir, 'schema.prisma')
-      }
-      if (fs.existsSync(path.join(projectDir, 'prisma/schema.prisma'))) {
-        return path.join(projectDir, 'prisma/schema.prisma')
-      }
-    }
-    const schemaPath = getSchemaPathSync()
-    if (!schemaPath) {
-      throw new Error(`Could not find schema.prisma in ${projectDir}`)
-    }
-
-    return schemaPath
-  }
-
   public getDatamodel(): string {
-    return fs.readFileSync(this.getDatamodelPath(), 'utf-8')
+    return fs.readFileSync(getDatamodelPath(this.projectDir), 'utf-8')
   }
 
   // TODO: optimize datapaths, where we have a datamodel already, use it
@@ -329,7 +312,7 @@ export class Lift {
     const datamodel = await this.getDatamodel()
 
     const generators = await getGenerators({
-      schemaPath: await this.getDatamodelPath(),
+      schemaPath: getDatamodelPath(this.projectDir),
       providerAliases: options.providerAliases,
       printDownloadProgress: false,
       version: packageJson.prisma.version,
@@ -337,7 +320,7 @@ export class Lift {
 
     this.studioPort = await getPort({ port: getPort.makeRange(5555, 5600) })
 
-    const datamodelPath = await this.getDatamodelPath()
+    const datamodelPath = getDatamodelPath(this.projectDir)
     const relativeDatamodelPath = path.relative(process.cwd(), datamodelPath)
 
     const renderer = new DevComponentRenderer({
@@ -401,7 +384,7 @@ export class Lift {
 
     await makeDir(this.devMigrationsDir)
 
-    fs.watch(await this.getDatamodelPath(), (eventType, filename) => {
+    fs.watch(getDatamodelPath(this.projectDir), (eventType, filename) => {
       if (eventType === 'change') {
         this.watchUp(options, renderer)
       }
