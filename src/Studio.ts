@@ -88,9 +88,9 @@ export class Studio {
     return ''
   }
 
-  public async restart(datamodel: string, providerAliases: { [key: string]: string }) {
+  public async restart(providerAliases: { [key: string]: string }) {
     if (this.instance) {
-      this.instance.restart({ datamodel })
+      this.instance.restart()
       return ''
     }
 

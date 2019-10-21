@@ -103,7 +103,7 @@ export class Lift {
           const after = Date.now()
           renderer && renderer.setState({ migrating: false, migratedIn: after - before })
           if (renderer) {
-            this.recreateStudioServer(datamodel, providerAliases)
+            this.recreateStudioServer(providerAliases)
           }
         }
 
@@ -196,10 +196,10 @@ export class Lift {
     return this.getDatamodel()
   }
 
-  public async recreateStudioServer(datamodel: string, providerAliases: { [key: string]: string }) {
+  public async recreateStudioServer(providerAliases: { [key: string]: string }) {
     try {
       if (this.studioServer) {
-        this.studioServer.restart(datamodel, providerAliases)
+        this.studioServer.restart(providerAliases)
         return
       }
 
@@ -347,7 +347,7 @@ export class Lift {
       debug(...args)
     }
 
-    this.recreateStudioServer(datamodel, options.providerAliases)
+    this.recreateStudioServer(options.providerAliases)
 
     const { migrationsToApply } = await this.getMigrationsToApply()
 
