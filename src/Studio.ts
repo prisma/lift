@@ -1,11 +1,11 @@
 import debugLib from 'debug'
+import fs from 'fs'
 import getPort from 'get-port'
 import path from 'path'
 
 import { getSchemaDirSync } from '@prisma/cli'
 import { getPlatform } from '@prisma/get-platform'
 
-import { fsExists } from './utils/fsExists'
 import { getDatamodelPath } from './utils/getDatamodelPath'
 
 export interface StudioOptions {
@@ -44,7 +44,7 @@ export class Studio {
       ]
 
       const pathsExist = await Promise.all(
-        pathCandidates.map(async candidate => ({ exists: await fsExists(candidate), path: candidate })),
+        pathCandidates.map(async candidate => ({ exists: fs.existsSync(candidate), path: candidate })),
       )
 
       const firstExistingPath = pathsExist.find(p => p.exists)
