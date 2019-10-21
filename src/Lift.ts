@@ -1,5 +1,4 @@
 import { Dictionary, getSchemaDirSync, getSchemaPath, getSchemaPathSync } from '@prisma/cli'
-import { getPlatform } from '@prisma/get-platform'
 import { getGenerators } from '@prisma/sdk'
 import 'array-flat-polyfill'
 import chalk from 'chalk'
@@ -24,6 +23,7 @@ import { highlightDatamodel } from './cli/highlight/highlight'
 import { blue } from './cli/highlight/theme'
 import { DevComponentRenderer } from './ink/DevComponentRenderer'
 import { LiftEngine } from './LiftEngine'
+import { Studio } from './Studio'
 import { EngineResults, FileMap, LocalMigration, LocalMigrationWithDatabaseSteps, LockFile, Migration } from './types'
 import { drawBox } from './utils/drawBox'
 import { formatms } from './utils/formartms'
@@ -168,7 +168,7 @@ export class Lift {
   )
   // tsline:enable
   private datamodelBeforeWatch: string = ''
-  private studioServer?: any
+  private studioServer?: Studio
   private studioPort: number = 5555
   private projectDir: string
   constructor(projectDir?: string) {
@@ -216,55 +216,12 @@ export class Lift {
   public async recreateStudioServer(datamodel: string, providerAliases: { [key: string]: string }) {
     try {
       if (this.studioServer) {
-        this.studioServer.restart({ datamodel })
+        this.studioServer.restart(datamodel, providerAliases)
         return
       }
 
-      const platform = await getPlatform()
-      const extension = platform === 'windows' ? '.exe' : ''
-
-      const pathCandidates = [
-        // ncc go home
-        // tslint:disable-next-line
-        eval(`require('path').join(__dirname, '../node_modules/@prisma/photon/query-engine-${platform}${extension}')`), // for local dev
-        // tslint:disable-next-line
-        eval(`require('path').join(__dirname, '../query-engine-${platform}${extension}')`), // for production
-      ]
-
-      const pathsExist = await Promise.all(
-        pathCandidates.map(async candidate => ({ exists: await exists(candidate), path: candidate })),
-      )
-
-      const firstExistingPath = pathsExist.find(p => p.exists)
-
-      if (!firstExistingPath) {
-        throw new Error(`Could not find any binary path for Studio. Looked in ${pathCandidates.join(', ')}`)
-      }
-
-      // const StudioServer = require('@prisma/studio-server').default
-      const StudioServer = (await import('@prisma/studio-server')).default
-
-      let photonWorkerPath: string | undefined = undefined
-      try {
-        const studioTransport = require.resolve('@prisma/studio-transports')
-        photonWorkerPath = path.join(path.dirname(studioTransport), 'photon-worker.js')
-      } catch (e) {
-        //
-      }
-
-      this.studioServer = new StudioServer({
-        port: this.studioPort,
-        debug: false,
-        binaryPath: firstExistingPath.path,
-        photonWorkerPath,
-        photonGenerator: {
-          version: packageJson.prisma.version,
-          providerAliases: providerAliases,
-        },
-        schemaPath: this.getDatamodelPath(),
-      })
-
-      await this.studioServer.start()
+      this.studioServer = new Studio({ projectDir: this.projectDir, port: this.studioPort })
+      await this.studioServer.start(providerAliases)
     } catch (e) {
       debug(e)
     }
