@@ -2,7 +2,6 @@ import { arg, Command, Dictionary, format, HelpError, isError } from '@prisma/cl
 import chalk from 'chalk'
 
 import { Studio } from '../../Studio'
-import { occupyPath } from '../../utils/occupyPath'
 
 export class StudioCommand implements Command {
   public static new(providerAliases: Dictionary<string>): StudioCommand {
@@ -56,8 +55,6 @@ export class StudioCommand implements Command {
     const studio = new Studio({
       port: args['--port'],
     })
-
-    await occupyPath(process.cwd())
 
     return await studio.start(this.providerAliases)
   }
