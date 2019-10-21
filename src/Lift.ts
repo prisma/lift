@@ -1,4 +1,4 @@
-import { Dictionary, getSchemaDirSync } from '@prisma/cli'
+
 import { getGenerators } from '@prisma/sdk'
 import 'array-flat-polyfill'
 import chalk from 'chalk'
@@ -211,7 +211,7 @@ export class Lift {
   public async recreateStudioServer(providerAliases: { [key: string]: string }) {
     try {
       if (this.studioServer) {
-        this.studioServer.restart(providerAliases)
+
         return
       }
 
