@@ -359,6 +359,12 @@ export class Lift {
       debug(...args)
     }
 
+    console.error = (...args) => {
+      debug(...args)
+    }
+
+    this.recreateStudioServer(options.providerAliases)
+
     const { migrationsToApply } = await this.getMigrationsToApply()
 
     if (migrationsToApply.length > 0) {
