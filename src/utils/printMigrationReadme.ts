@@ -74,8 +74,8 @@ main()
 }
 
 function makePatch({ datamodelA, datamodelB, migrationId, lastMigrationId }: MigrationReadmeInput) {
-  const patch = createPatch('datamodel.dml', datamodelA, datamodelB)
-  const header = `diff --git datamodel.dml datamodel.dml
+  const patch = createPatch('datamodel.mdl', datamodelA, datamodelB)
+  const header = `diff --git datamodel.mdl datamodel.mdl
 migration ${lastMigrationId}..${migrationId}\n`
   return header + filterUselessLines(patch)
 }
