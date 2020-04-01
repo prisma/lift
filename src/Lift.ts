@@ -30,7 +30,7 @@ import { formatms } from './utils/formartms'
 import { groupBy } from './utils/groupBy'
 import { isWatchMigrationName } from './utils/isWatchMigrationName'
 import { deserializeLockFile, initLockFile, serializeLockFile } from './utils/LockFile'
-import { now, timestampToDate } from './utils/now'
+import { now, timestampToUTCDate } from './utils/now'
 import plusX from './utils/plusX'
 import { highlightMigrationsSQL, printDatabaseStepsOverview } from './utils/printDatabaseSteps'
 import { printDatamodelDiff } from './utils/printDatamodelDiff'
@@ -414,9 +414,9 @@ export class Lift {
     let lastChanged: undefined | Date
     if (watchMigrations.length > 0) {
       const timestamp = watchMigrations[watchMigrations.length - 1].id.split('-')[1]
-      lastChanged = timestampToDate(timestamp)
+      lastChanged = timestampToUTCDate(timestamp)
     } else if (localMigrations.length > 0) {
-      lastChanged = timestampToDate(localMigrations[localMigrations.length - 1].id.split('-')[0])
+      lastChanged = timestampToUTCDate(localMigrations[localMigrations.length - 1].id.split('-')[0])
     }
     renderer.setState({ lastChanged })
 

@@ -1,11 +1,11 @@
 export function now() {
   const now = new Date()
-  return `${now.getFullYear()}${prefixZero(now.getMonth() + 1)}${prefixZero(now.getDate())}${prefixZero(
-    now.getHours(),
-  )}${prefixZero(now.getMinutes())}${prefixZero(now.getSeconds())}`
+  return `${now.getUTCFullYear()}${prefixZero(now.getUTCMonth() + 1)}${prefixZero(now.getUTCDate())}${prefixZero(
+    now.getUTCHours(),
+  )}${prefixZero(now.getUTCMinutes())}${prefixZero(now.getUTCSeconds())}`
 }
 
-export function timestampToDate(timestamp: string): Date | undefined {
+export function timestampToUTCDate(timestamp: string): Date | undefined {
   if (!timestamp || timestamp.length !== 14) {
     return undefined
   }
@@ -16,14 +16,14 @@ export function timestampToDate(timestamp: string): Date | undefined {
   const minutes = Number(timestamp.slice(10, 12))
   const seconds = Number(timestamp.slice(12, 14))
 
-  return new Date(year, month - 1, date, hours, minutes, seconds)
+  return new Date(Date.UTC(year, month - 1, date, hours, minutes, seconds))
 }
 
 const prefixZero = (value: number) => ('0' + value).slice(-2)
 
 export function renderDate(date: Date) {
-  if (date.getDate() !== new Date().getDate()) {
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+  if (date.getUTCDate() !== new Date().getUTCDate()) {
+    return date.toDateString() + ' ' + date.toTimeString()
   }
-  return date.toLocaleTimeString()
+  return date.toTimeString()
 }
