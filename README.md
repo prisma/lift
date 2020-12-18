@@ -2,7 +2,7 @@
 
 Prisma Migrate is now in Preview. You can find the official documentation [here](https://www.prisma.io/docs/concepts/components/prisma-migrate) and you can read the announcement [here](https://www.prisma.io/blog/prisma-migrate-preview-b5eno5g08d0b).
 
-Issues and feature requests for Prisma Migrate are now tracked at [prisma/prisma](https://github.com/prisma/prisma). This repository is archived and kept as read-only for historical purposes.
+Issues and feature requests for Prisma Migrate are now tracked at [prisma/prisma](https://github.com/prisma/prisma/issues?q=is%3Aopen+is%3Aissue+label%3A%22topic%3A+migrate%22). You can report issues or submit feature requests by [creating new GitHub issues](https://github.com/prisma/prisma/issues/new/choose). This repository is archived and kept as read-only for historical purposes.
 
 # Legacy content
 
